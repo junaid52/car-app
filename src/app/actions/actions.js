@@ -1,6 +1,6 @@
 'use server';
 
-// import { put } from '@vercel/blob';
+import { put } from '@vercel/blob';
 import { auth } from '@/auth/auth';
 import prisma from '@/initilize-prisma/initilize-prisma';
 import { revalidatePath } from 'next/cache';
@@ -18,18 +18,19 @@ export async function addCar(formData) {
     const phone = formData.get('phone');
     const city = formData.get('city');
     const copies = parseInt(formData.get('copies'));
-
-    // const imageUrls = [];
-    // for (let i = 0; i < copies; i++) {
-    //   const image = formData.get(`image${i}`);
-    //   if (image) {
-    //     const blob = await put(`cars/${Date.now()}-${image.name}`, image, {
-    //       access: 'public',
-    //     });
-    //     imageUrls.push(blob.url);
-    //   }
-    // }
-    console.log(session.user.id);
+    console.log(formData.get('image'));
+    const imageUrls = [];
+    for (let i = 0; i < copies; i++) {
+      const image = formData.get(`image${i}`);
+      if (image) {
+        const blob = await put(`cars/${Date.now()}-${image.name}`, image, {
+          access: 'public',
+        });
+        console.log(blob);
+        imageUrls.push(blob.url);
+      }
+    }
+    console.log(imageUrls);
     const car = await prisma.car.create({
       data: {
         carModel,
@@ -37,7 +38,7 @@ export async function addCar(formData) {
         phone,
         city,
         copies,
-        images: ['/test'],
+        images: imageUrls,
 
         userId: session.user.id,
       },

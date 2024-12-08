@@ -27,6 +27,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import toast from 'react-hot-toast';
 import { addCar } from '@/app/actions/actions';
 import { useFormStatus } from 'react-dom';
+import { X } from 'lucide-react';
 
 const formSchema = z.object({
   carModel: z.string().min(2, {
@@ -53,6 +54,7 @@ export default function AddCarForm() {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const { pending } = useFormStatus();
+  const [previews, setPreviews] = useState([]);
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -78,9 +80,9 @@ export default function AddCarForm() {
     formData.append('city', values.city);
     formData.append('copies', values.copies);
     values.images.forEach((image, index) => {
-      formData.append(`image`, image);
+      formData.append(`image${index}`, image);
     });
-    console.log('formData:', formData.get('carModel'));
+    console.log('formData:', formData.get('image'));
 
     try {
       const result = await addCar(formData);
@@ -92,17 +94,35 @@ export default function AddCarForm() {
       }
     } catch (error) {
       console.error('Error adding car:', error);
-      toast('Error adding car');
+      toast.error('Error adding car');
     }
   };
 
   const handleImageChange = (e, index) => {
     const file = e.target.files[0];
     if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const newPreviews = [...previews];
+        newPreviews[index] = reader.result;
+        setPreviews(newPreviews);
+      };
+      reader.readAsDataURL(file);
+
       const updatedImages = [...form.getValues('images')];
       updatedImages[index] = file;
       form.setValue('images', updatedImages);
     }
+  };
+
+  const removeImage = (index) => {
+    const updatedImages = [...form.getValues('images')];
+    updatedImages.splice(index, 1);
+    form.setValue('images', updatedImages);
+
+    const newPreviews = [...previews];
+    newPreviews.splice(index, 1);
+    setPreviews(newPreviews);
   };
 
   return (
@@ -204,37 +224,59 @@ export default function AddCarForm() {
             </FormItem>
           )}
         />
-        {fields.map((field, index) => (
-          <FormField
-            key={field.id}
-            control={form.control}
-            name={`images.${index}`}
-            render={({ field: imageField }) => (
-              <FormItem>
-                <FormLabel>Image {index + 1}</FormLabel>
-                <FormControl>
-                  <Input
-                    type='file'
-                    accept='image/*'
-                    onChange={(e) => handleImageChange(e, index)}
-                  />
-                </FormControl>
-                {imageField.value && (
-                  <Card>
-                    <CardContent className='p-2'>
-                      <img
-                        src={URL.createObjectURL(imageField.value)}
-                        alt={`Preview ${index + 1}`}
-                        className='w-full h-32 object-cover rounded'
-                      />
-                    </CardContent>
-                  </Card>
+        <FormDescription>
+          You can upload up to {form.watch('copies')} image
+          {form.watch('copies') !== '1' ? 's' : ''}. (
+          {form.watch('images').filter(Boolean).length} / {form.watch('copies')}{' '}
+          uploaded)
+        </FormDescription>
+        <div className='grid grid-cols-2 md:grid-cols-4 gap-4'>
+          {Array.from({ length: parseInt(form.watch('copies')) }).map(
+            (_, index) => (
+              <FormField
+                key={index}
+                control={form.control}
+                name={`images.${index}`}
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className='sr-only'>Image {index + 1}</FormLabel>
+                    <FormControl>
+                      <div className='relative'>
+                        <Input
+                          type='file'
+                          accept='image/*'
+                          onChange={(e) => handleImageChange(e, index)}
+                          className='absolute inset-0 w-full h-full opacity-0 cursor-pointer'
+                        />
+                        <div className='w-full h-32 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center'>
+                          {previews[index] ? (
+                            <div className='relative w-full h-full'>
+                              <img
+                                src={previews[index]}
+                                alt={`Preview ${index + 1}`}
+                                className='w-full h-full object-cover rounded-lg'
+                              />
+                              <button
+                                type='button'
+                                onClick={() => removeImage(index)}
+                                className='absolute top-1 right-1 bg-red-500 text-white rounded-full p-1'
+                              >
+                                <X size={16} />
+                              </button>
+                            </div>
+                          ) : (
+                            <span className='text-gray-500'>Add Image</span>
+                          )}
+                        </div>
+                      </div>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
                 )}
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        ))}
+              />
+            )
+          )}
+        </div>
         <Button type='submit' disabled={isPending || pending}>
           {isPending || pending ? 'Submitting...' : 'Submit'}
         </Button>

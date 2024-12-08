@@ -6,7 +6,7 @@ export default function Layout({ children }) {
   return (
     <div className='flex flex-col h-screen'>
       <header className='bg-gray-900 text-gray-50'>
-        <div className='container flex items-center justify-between h-16'>
+        <div className='container max-auto p-4 flex items-center justify-between h-16'>
           <div className='flex items-center gap-4'>
             <Link href='/' className='text-lg font-bold'>
               Car App

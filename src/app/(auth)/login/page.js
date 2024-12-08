@@ -61,44 +61,49 @@ export default function Page() {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-8'>
-        <FormField
-          control={form.control}
-          name='email'
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Email</FormLabel>
-              <FormControl>
-                <Input placeholder='Enter your email' {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
+      <div className='h-dvh flex flex-col items-center justify-center'>
+        <form
+          onSubmit={form.handleSubmit(onSubmit)}
+          className='w-[350px] space-y-8'
+        >
+          <FormField
+            control={form.control}
+            name='email'
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Email</FormLabel>
+                <FormControl>
+                  <Input placeholder='Enter your email' {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name='password'
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Password</FormLabel>
+                <FormControl>
+                  <Input
+                    type='password'
+                    placeholder='Enter your password'
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          {error && (
+            <FormMessage type='error'>Invalid email or password</FormMessage>
           )}
-        />
-        <FormField
-          control={form.control}
-          name='password'
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Password</FormLabel>
-              <FormControl>
-                <Input
-                  type='password'
-                  placeholder='Enter your password'
-                  {...field}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        {error && (
-          <FormMessage type='error'>Invalid email or password</FormMessage>
-        )}
-        <Button type='submit' disabled={isLoading}>
-          {isLoading ? 'Logging in...' : 'Log in'}
-        </Button>
-      </form>
+          <Button type='submit' disabled={isLoading}>
+            {isLoading ? 'Logging in...' : 'Log in'}
+          </Button>
+        </form>
+      </div>
     </Form>
   );
 }
