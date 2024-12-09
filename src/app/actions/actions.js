@@ -7,7 +7,6 @@ import { revalidatePath } from 'next/cache';
 
 export async function addCar(formData) {
   try {
-    console.log(formData);
     const session = await auth();
     if (!session) {
       throw new Error('Unauthorized');
@@ -18,7 +17,7 @@ export async function addCar(formData) {
     const phone = formData.get('phone');
     const city = formData.get('city');
     const copies = parseInt(formData.get('copies'));
-    console.log(formData.get('image'));
+
     const imageUrls = [];
     for (let i = 0; i < copies; i++) {
       const image = formData.get(`image${i}`);
@@ -26,11 +25,11 @@ export async function addCar(formData) {
         const blob = await put(`cars/${Date.now()}-${image.name}`, image, {
           access: 'public',
         });
-        console.log(blob);
+
         imageUrls.push(blob.url);
       }
     }
-    console.log(imageUrls);
+
     const car = await prisma.car.create({
       data: {
         carModel,
@@ -50,19 +49,6 @@ export async function addCar(formData) {
     revalidatePath('/');
     return { success: true, message: 'Car added successfully', car };
   } catch (error) {
-    console.log('in catch block');
-    console.log(error.message);
     return { success: false, error: error.message };
-  }
-}
-
-export async function getCars() {
-  try {
-    await dbConnect();
-    const cars = await Car.find().sort({ createdAt: -1 });
-    return cars;
-  } catch (error) {
-    console.error('Error fetching cars:', error);
-    throw new Error('Failed to fetch cars');
   }
 }

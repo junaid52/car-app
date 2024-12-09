@@ -21,13 +21,13 @@ export const authOptions = {
             email: credentials.email,
           },
         });
-        console.log(user, 'user');
+
         if (!user) {
           return null;
         }
 
         const isPasswordValid = credentials.password === user.password;
-        console.log(isPasswordValid, 'isPasswordValid');
+
         if (!isPasswordValid) {
           return null;
         }
