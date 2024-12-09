@@ -1,13 +1,6 @@
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import Image from 'next/image';
 export default function CarCard({ model, image, price }) {
-  console.log(image);
   return (
     <Card className='w-full max-w-md overflow-hidden'>
       <CardContent className='p-0'>

@@ -82,7 +82,6 @@ export default function AddCarForm() {
     values.images.forEach((image, index) => {
       formData.append(`image${index}`, image);
     });
-    console.log('formData:', formData.get('image'));
 
     try {
       const result = await addCar(formData);

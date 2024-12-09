@@ -15,7 +15,6 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
-import { useToast } from '@/hooks/use-toast';
 
 import { signIn } from 'next-auth/react';
 
@@ -50,7 +49,7 @@ export default function Page() {
       redirect: false,
     });
     setIsLoading(false);
-    console.log(result);
+
     if (result?.error) {
       setError(result.error);
       return;
