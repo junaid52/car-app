@@ -11,15 +11,28 @@ model Car {
   id       String   @id @default(auto()) @map("_id") @db.ObjectId
   carModel String
   city     String
-  copies   Int
+  copies   BigInt
   images   String[]
   phone    String
-  price    Int
+  price    BigInt
   userId   String   @db.ObjectId
+  user     User   @relation(fields: [userId], references: [id])
+}
+
+model Notification {
+  id      String  @id @default(auto()) @map("_id") @db.ObjectId
+  isRead  Boolean
+  message String
+  type    String
+  userId  String
 }
 
 model User {
   id       String @id @default(auto()) @map("_id") @db.ObjectId
+  /// Could not determine type: the field only had null or empty values in the sample set.
+  cars     Car[]
   email    String @unique
   password String
 }
+
+
